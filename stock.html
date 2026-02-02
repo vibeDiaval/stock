@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주식 투자 마스터북 (통합본)</title>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        :root {
+            --bg: #f8fafc;
+            --text-main: #1e293b;
+            --text-sub: #475569;
+            --card-bg: #ffffff;
+            /* 기본 테마 (1권 파랑) */
+            --primary: #2563eb;
+            --accent: #f59e0b;
+            --box-bg: #eff6ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            min-height: 100vh;
+        }
+
+        /* 탭 네비게이션 */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #94a3b8;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover { background: #f1f5f9; color: #64748b; }
+
+        .tab-btn.active {
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        /* 탭별 컬러 테마 설정 */
+        /* 1권 버튼 */
+        .tab-btn[data-tab="vol1"].active { background: #2563eb; }
+        /* 2권 버튼 */
+        .tab-btn[data-tab="vol2"].active { background: #0f766e; }
+        /* 3권 버튼 */
+        .tab-btn[data-tab="vol3"].active { background: #be123c; }
+
+        /* 탭 내용 영역 */
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+
+        /* 1권 테마 변수 재정의 */
+        #vol1 { --primary: #2563eb; --box-bg: #eff6ff; }
+        /* 2권 테마 변수 재정의 */
+        #vol2 { --primary: #0f766e; --box-bg: #f0fdf4; }
+        /* 3권 테마 변수 재정의 */
+        #vol3 { --primary: #be123c; --box-bg: #fff1f2; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 공통 스타일 (이전 코드 재사용) */
+        header { text-align: center; margin-bottom: 50px; padding-bottom: 20px; border-bottom: 3px solid var(--primary); }
+        h1 { margin: 0; font-size: 2.2rem; color: #0f172a; letter-spacing: -1px; }
+        .subtitle { margin-top: 10px; color: var(--text-sub); }
+
+        .chapter { margin-bottom: 60px; }
+        .chapter-title {
+            font-size: 1.6rem; font-weight: 800; color: var(--primary);
+            border-left: 5px solid var(--accent); padding-left: 15px; margin-bottom: 25px;
+            display: flex; align-items: center;
+        }
+
+        .term-card {
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+            padding: 25px; margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .term-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 15px;
+        }
+        .term-name { font-size: 1.3rem; font-weight: bold; color: #0f172a; }
+        .term-tag { background: #f1f5f9; color: var(--text-sub); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; }
+
+        .analogy-box {
+            background: var(--box-bg); border-left: 4px solid var(--primary);
+            padding: 15px; border-radius: 0 8px 8px 0; margin-top: 15px;
+        }
+        .analogy-title { font-weight: bold; color: var(--primary); margin-bottom: 5px; }
+        .analogy-content { font-size: 0.95rem; color: #334155; }
+
+        .yt-btn {
+            display: inline-flex; align-items: center; gap: 5px; margin-top: 15px;
+            padding: 8px 16px; background: #fff0f0; color: #cc0000;
+            border: 1px solid #ffcdd2; border-radius: 6px; text-decoration: none;
+            font-size: 0.85rem; font-weight: bold; transition: 0.2s;
+        }
+        .yt-btn:hover { background: #cc0000; color: white; }
+
+        .fab {
+            position: fixed; bottom: 30px; right: 30px;
+            background: #0f172a; color: white; padding: 15px 30px;
+            border-radius: 50px; cursor: pointer; border: none; font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 100;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; margin: 0; width: 100%; max-width: 100%; }
+            .tab-nav, .fab, .yt-btn { display: none; }
+            .tab-content { display: none; }
+            .tab-content.active { display: block; }
+            .chapter { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="openTab('vol1')" data-tab="vol1">📘 1권: 용어 정복</button>
+        <button class="tab-btn" onclick="openTab('vol2')" data-tab="vol2">🌲 2권: 산업 분석</button>
+        <button class="tab-btn" onclick="openTab('vol3')" data-tab="vol3">🚦 3권: 실전 차트</button>
+    </div>
+
+    <div id="vol1" class="tab-content active">
+        <header>
+            <h1>주식 용어 완전 정복</h1>
+            <p class="subtitle">초등학생도 이해하는 치킨집 & 아파트 비유</p>
+        </header>
+
+        <div class="chapter">
+            <div class="chapter-title">💰 1장. 가치 평가 (구구단)</div>
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">EPS (주당순이익)</div>
+                    <div class="term-tag">기초체력</div>
+                </div>
+                <div class="explanation">주식 1주가 1년 동안 벌어들이는 순이익. 매년 늘어나야 좋은 회사.</div>
+                <div class="analogy-box">
+                    <div class="analogy-title">🍗 치킨집 비유</div>
+                    <div class="analogy-content">알바생(주식) 1명이 1년에 치킨을 팔아 100만 원(순이익)을 남기면 EPS는 100만 원.</div>
+                </div>
+                <a href="https://www.youtube.com/results?search_query=주식+EPS+쉽게+설명" target="_blank" class="yt-btn">▶ 관련 영상 보기</a>
+            </div>
+
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">PER (주가수익비율)</div>
+                    <div class="term-tag">본전 회수 기간</div>
+                </div>
+                <div class="explanation">원금을 회수하는 데 걸리는 시간(년). 낮을수록 저평가.</div>
+                <div class="analogy-box">
+                    <div class="analogy-title">🏢 아파트 월세 비유</div>
+                    <div class="analogy-content">5억 아파트 사서 월세로 1년에 5천만 원 벌면, 본전 뽑는데 10년 걸림. (PER 10배)</div>
+                </div>
+                <a href="https://www.youtube.com/results?search_query=주식+PER+보는법" target="_blank" class="yt-btn">▶ 관련 영상 보기</a>
+            </div>
+
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">PBR (주가순자산비율)</div>
+                    <div class="term-tag">최후의 보루</div>
+                </div>
+                <div class="explanation">회사가 망했을 때 청산가치 대비 주가 비율.</div>
+                <div class="analogy-box">
+                    <div class="analogy-title">🛑 폐업 세일 비유</div>
+                    <div class="analogy-content">가게 집기(자산)가 1억인데 가게를 8천만 원에 내놓음(PBR 0.8). 사자마자 팔아도 2천만 원 이득.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">🎪 2장. 시장의 규칙</div>
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">시가총액</div>
+                    <div class="term-tag">진짜 크기</div>
+                </div>
+                <div class="explanation">주가 × 주식 수. 회사를 통째로 인수하는 가격.</div>
+                <div class="analogy-box">
+                    <div class="analogy-title">🍫 초콜릿 가게</div>
+                    <div class="analogy-content">한 조각 가격(주가)보다 가게에 깔린 전체 초콜릿 가격(시가총액)이 가게의 진짜 규모.</div>
+                </div>
+            </div>
+            
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">호가 & 체결</div>
+                    <div class="term-tag">거래 성사</div>
+                </div>
+                <div class="explanation">사려는 가격과 팔려는 가격이 만나 거래가 이루어지는 것.</div>
+                <div class="analogy-box">
+                    <div class="analogy-title">👟 당근마켓</div>
+                    <div class="analogy-content">"10만원에 팜" vs "9만원에 삼". 합의해서 9만 5천원에 거래되면 그게 '체결'.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chapter">
+            <div class="chapter-title">🕵️ 3장. 고수들의 체크리스트</div>
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">부채비율 & 수급</div>
+                    <div class="term-tag">위험과 기회</div>
+                </div>
+                <div class="analogy-box">
+                    <div class="analogy-title">🏥 건강검진 & 🐳 고래</div>
+                    <div class="analogy-content">
+                        1. 빚이 내 돈의 2배(200%) 넘으면 위험.<br>
+                        2. 외국인(고래)이 계속 사면 글로벌급 저평가 신호.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="vol2" class="tab-content">
+        <header>
+            <h1>산업 분석 완전 정복</h1>
+            <p class="subtitle">나무보다 숲을 보는 Top-Down 전략</p>
+        </header>
+
+        <div class="chapter">
+            <div class="chapter-title">🌊 1장. 슈퍼 사이클의 발견</div>
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">곡괭이와 청바지 전략</div>
+                    <div class="term-tag">인프라 투자</div>
+                </div>
+                <div class="explanation">주인공(AI)보다 주인공을 돕는 필수 산업(전력)이 더 안전하고 확실함.</div>
+                <div class="analogy-box">
+                    <div class="analogy-title">⛏️ 골드러시</div>
+                    <div class="analogy-content">금(AI)을 캐러 간 사람보다, 그들에게 청바지와 곡괭이(변압기)를 판 리바이스가 돈을 더 벎.</div>
+                </div>
+                <a href="https://www.youtube.com/results?search_query=AI+전력+슈퍼사이클" target="_blank" class="yt-btn">▶ 영상으로 보기</a>
+            </div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">⚡ 2장. 전력 산업 심층 분석</div>
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">1그룹 vs 2그룹</div>
+                    <div class="term-tag">한국 vs 미국</div>
+                </div>
+                <div class="analogy-box">
+                    <div class="analogy-title">🥊 스타일 비교</div>
+                    <div class="analogy-content">
+                        <strong>🇰🇷 1그룹 (수출형 파이터):</strong> HD현대일렉트릭. 만들어서 보냄. 성장 빠름(High Return).<br>
+                        <strong>🇺🇸 2그룹 (현장 지배자):</strong> 이튼. 현장 설치/운영. 정부 지원 받음. 안정적(Low Risk).
+                    </div>
+                </div>
+            </div>
+
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">PPI & 리드 타임</div>
+                    <div class="term-tag">현장의 신호</div>
+                </div>
+                <div class="explanation">변압기 가격(PPI)은 계속 오르고, 주문 대기 시간(리드 타임)은 2년 이상 밀려있음 → 호황 지속.</div>
+                <a href="https://www.youtube.com/results?search_query=미국+전력망+투자+수혜주" target="_blank" class="yt-btn">▶ 영상으로 보기</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="vol3" class="tab-content">
+        <header>
+            <h1>차트와 실전 매매</h1>
+            <p class="subtitle">언제 사고 참아야 하는가? 타이밍의 예술</p>
+        </header>
+
+        <div class="chapter">
+            <div class="chapter-title">🚦 1장. 차트의 신호등 (이평선)</div>
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">20일선 & 데드크로스</div>
+                    <div class="term-tag">생명선</div>
+                </div>
+                <div class="analogy-box">
+                    <div class="analogy-title">🛤️ 기차와 선로</div>
+                    <div class="analogy-content">
+                        20일선(선로) 아래로 기차가 탈선하면 무조건 관망.<br>
+                        5일선이 20일선을 뚫고 내려가면(데드크로스) 소나기가 오는 것이니 피해야 함.
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/results?search_query=주식+이동평균선+보는법" target="_blank" class="yt-btn">▶ 영상으로 보기</a>
+            </div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">🌡️ 2장. 시장의 온도계 (RSI)</div>
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">RSI (상대강도지수)</div>
+                    <div class="term-tag">과열 vs 침체</div>
+                </div>
+                <div class="analogy-box">
+                    <div class="analogy-title">🌡️ 목욕탕 온도계</div>
+                    <div class="analogy-content">
+                        <strong>70 이상(과열):</strong> "앗 뜨거!" 곧 식을 확률 높음 (매도/관망)<br>
+                        <strong>30 이하(침체):</strong> "으 차가워!" 사람들이 겁먹고 도망감 (매수 기회)
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/results?search_query=주식+RSI+매매기법" target="_blank" class="yt-btn">▶ 영상으로 보기</a>
+            </div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">🚀 3장. 필승 매수 공식</div>
+            <div class="term-card">
+                <div class="term-header">
+                    <div class="term-name">3단계 확인 사살</div>
+                    <div class="term-tag">Wait & Confirm</div>
+                </div>
+                <div class="explanation">떨어지는 칼날은 잡지 않는다. 바닥을 확인하고 무릎에서 산다.</div>
+                <div class="analogy-box">
+                    <div class="analogy-title">🦶 실전 3단계</div>
+                    <div class="analogy-content">
+                        1. <strong>Wait:</strong> 주가가 60일선(바닥)까지 올 때까지 기다림.<br>
+                        2. <strong>Check:</strong> 그때 RSI가 30 근처인가?<br>
+                        3. <strong>Action:</strong> 5일선 위로 고개를 들고 <strong>양봉(빨강)</strong>이 뜨면 매수!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<button class="fab" onclick="window.print()">🖨️ 현재 페이지 인쇄</button>
+
+<script>
+    function openTab(tabName) {
+        // 모든 탭 내용 숨기기
+        var i, tabContent, tabBtns;
+        tabContent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].classList.remove("active");
+        }
+
+        // 모든 탭 버튼 비활성화
+        tabBtns = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tabBtns.length; i++) {
+            tabBtns[i].classList.remove("active");
+        }
+
+        // 선택된 탭 보이기 및 버튼 활성화
+        document.getElementById(tabName).classList.add("active");
+        
+        // 버튼 활성화 스타일 적용 (data-tab 속성 이용)
+        var activeBtn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+        if(activeBtn) activeBtn.classList.add("active");
+        
+        // 스크롤 최상단으로 이동
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>
